@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="wineGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#8B1538;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#5D1725;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Copa de vino -->
+  <path d="M 30 15 Q 25 30, 30 45 L 40 65 L 40 80 L 35 80 L 35 85 L 65 85 L 65 80 L 60 80 L 60 65 L 70 45 Q 75 30, 70 15 Z" 
+        fill="url(#wineGradient)" 
+        stroke="#1A1A1A" 
+        stroke-width="2"/>
+  
+  <!-- Vino en la copa -->
+  <ellipse cx="50" cy="35" rx="18" ry="8" fill="#8B1538" opacity="0.8"/>
+  
+  <!-- Brillo en la copa -->
+  <path d="M 35 25 Q 38 22, 40 25" 
+        fill="none" 
+        stroke="#D4AF37" 
+        stroke-width="1.5" 
+        opacity="0.6"/>
+</svg>

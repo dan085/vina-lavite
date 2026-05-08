@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="wineGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#5D1725;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#3A0F18;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <circle cx="32" cy="32" r="30" fill="url(#wineGradient)" />
+  <path d="M32 12 C28 12 24 16 24 22 C24 28 28 34 32 34 C36 34 40 28 40 22 C40 16 36 12 32 12 Z M32 34 L32 48 M24 48 L40 48" stroke="#D4AF37" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M26 22 L38 22" stroke="#D4AF37" stroke-width="2" stroke-opacity="0.5" />
+</svg>
