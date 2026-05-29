@@ -1,13 +1,13 @@
 import { Component, inject, computed, signal, AfterViewInit, OnDestroy, ElementRef, effect } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { TranslationService } from '../../services/translation.service';
+import { ScrollRevealService } from '../../services/scroll-reveal.service';
 
 type WineCategoryKey = 'red' | 'white' | 'rose' | 'sparkling';
 type FilterKey = 'all' | WineCategoryKey;
 
 @Component({
   selector: 'app-vinos',
-  imports: [CommonModule],
+  imports: [],
   template: `
     <div class="vinos">
       <section class="page-hero">
@@ -17,19 +17,20 @@ type FilterKey = 'all' | WineCategoryKey;
 
       <section class="container">
         <div class="filters">
-          <button
-            *ngFor="let filter of filters()"
-            class="filter-btn"
-            [class.active]="selectedFilter() === filter.value"
-            (click)="selectedFilter.set(filter.value)"
-          >
-            {{ filter.label }}
-          </button>
+          @for (filter of filters(); track filter.value) {
+            <button
+              class="filter-btn"
+              [class.active]="selectedFilter() === filter.value"
+              (click)="selectedFilter.set(filter.value)"
+            >
+              {{ filter.label }}
+            </button>
+          }
         </div>
 
         <div class="wines-grid">
-          <div class="wine-card" *ngFor="let wine of filteredWines(); let i = index"
-               [style.--i]="i">
+          @for (wine of filteredWines(); track wine.name; let i = $index) {
+          <div class="wine-card" [style.--i]="i">
             <div class="wine-image">
               <div class="wine-icon-wrap">
                 <svg class="wine-svg" viewBox="0 0 64 120" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -64,6 +65,7 @@ type FilterKey = 'all' | WineCategoryKey;
               </div>
             </div>
           </div>
+          }
         </div>
       </section>
     </div>

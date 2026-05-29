@@ -1,7 +1,9 @@
-import { Component, signal, inject } from '@angular/core';
-import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
+import { Component, signal, inject, AfterViewInit } from '@angular/core';
+import { RouterOutlet, RouterLink, RouterLinkActive, Router, NavigationEnd } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { filter } from 'rxjs/operators';
 import { TranslationService, Language } from './services/translation.service';
+import { ScrollRevealService } from './services/scroll-reveal.service';
 
 @Component({
   selector: 'app-root',
@@ -9,16 +11,30 @@ import { TranslationService, Language } from './services/translation.service';
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
-export class App {
+export class App implements AfterViewInit {
   protected readonly title = signal('Viña La Vite');
   protected menuOpen = signal(false);
   protected translationService = inject(TranslationService);
-  
-  // Expose the translation signal directly for easier access in template
   protected t = this.translationService.t;
 
+  private router = inject(Router);
+  private scrollReveal = inject(ScrollRevealService);
+
+  constructor() {
+    this.router.events.pipe(
+      filter(e => e instanceof NavigationEnd)
+    ).subscribe(() => {
+      window.scrollTo({ top: 0, behavior: 'instant' });
+      setTimeout(() => this.scrollReveal.init(), 120);
+    });
+  }
+
+  ngAfterViewInit() {
+    this.scrollReveal.init();
+  }
+
   toggleMenu() {
-    this.menuOpen.update(value => !value);
+    this.menuOpen.update(v => !v);
   }
 
   closeMenu() {

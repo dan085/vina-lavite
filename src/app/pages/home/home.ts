@@ -1,11 +1,11 @@
-import { Component, inject, computed } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, inject, computed, AfterViewInit, OnDestroy, ElementRef } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { TranslationService } from '../../services/translation.service';
+import { ScrollRevealService } from '../../services/scroll-reveal.service';
 
 @Component({
   selector: 'app-home',
-  imports: [CommonModule, RouterLink],
+  imports: [RouterLink],
   template: `
     <div class="home">
       <!-- Hero Section -->
@@ -23,18 +23,20 @@ import { TranslationService } from '../../services/translation.service';
       <!-- Destacados Section -->
       <section class="featured">
         <div class="container">
-          <h2>{{ t().featured.title }}</h2>
+          <h2 class="reveal">{{ t().featured.title }}</h2>
           <div class="wine-grid">
-            <div class="wine-card" *ngFor="let wine of featuredWines()">
-              <div class="wine-image">
-                <img [src]="wine.image" [alt]="wine.name" class="wine-bottle"
-                     onerror="this.style.display='none';this.parentElement.innerHTML='<div class=wine-placeholder>🍷</div>'" />
+            @for (wine of featuredWines(); track wine.name) {
+              <div class="wine-card reveal">
+                <div class="wine-image">
+                  <img [src]="wine.image" [alt]="wine.name" class="wine-bottle"
+                       onerror="this.style.display='none';this.parentElement.innerHTML='<div class=wine-placeholder></div>'" />
+                </div>
+                <h3>{{ wine.name }}</h3>
+                <p class="wine-type">{{ wine.type }}</p>
+                <p class="wine-description">{{ wine.description }}</p>
+                <a routerLink="/vinos" class="wine-link">{{ t().featured.viewMore }}</a>
               </div>
-              <h3>{{ wine.name }}</h3>
-              <p class="wine-type">{{ wine.type }}</p>
-              <p class="wine-description">{{ wine.description }}</p>
-              <a routerLink="/vinos" class="wine-link">{{ t().featured.viewMore }}</a>
-            </div>
+            }
           </div>
         </div>
       </section>
@@ -43,16 +45,14 @@ import { TranslationService } from '../../services/translation.service';
       <section class="about-preview">
         <div class="container">
           <div class="about-content">
-            <div class="about-text">
+            <div class="about-text reveal-left">
               <h2>{{ t().about.title }}</h2>
-              <p>
-                {{ t().about.text }}
-              </p>
+              <p>{{ t().about.text }}</p>
               <a routerLink="/sobre-nosotros" class="btn btn-outline">{{ t().about.btn }}</a>
             </div>
-            <div class="about-image">
+            <div class="about-image reveal-right">
               <img src="/images/barriles.jpg" alt="Barriles Viña La Vite" class="about-img"
-                   onerror="this.style.display='none';this.parentElement.innerHTML='<div class=image-placeholder>🍇</div>'" />
+                   onerror="this.style.display='none'" />
             </div>
           </div>
         </div>
@@ -61,9 +61,9 @@ import { TranslationService } from '../../services/translation.service';
       <!-- CTA Section -->
       <section class="cta">
         <div class="container">
-          <h2>{{ t().cta.title }}</h2>
-          <p>{{ t().cta.text }}</p>
-          <a routerLink="/contacto" class="btn btn-primary">{{ t().cta.btn }}</a>
+          <h2 class="reveal">{{ t().cta.title }}</h2>
+          <p class="reveal reveal-delay-1">{{ t().cta.text }}</p>
+          <a routerLink="/contacto" class="btn btn-primary reveal reveal-delay-2">{{ t().cta.btn }}</a>
         </div>
       </section>
     </div>
@@ -442,9 +442,12 @@ import { TranslationService } from '../../services/translation.service';
     }
   `]
 })
-export class HomeComponent {
+export class HomeComponent implements AfterViewInit, OnDestroy {
   protected translationService = inject(TranslationService);
   protected t = this.translationService.t;
+  private scrollReveal = inject(ScrollRevealService);
+  private el = inject(ElementRef);
+  private rafId = 0;
 
   private wineImages = [
     '/images/vinos/malbec-colchagua.jpg',
@@ -458,4 +461,38 @@ export class HomeComponent {
       image: this.wineImages[i]
     }))
   );
+
+  ngAfterViewInit() {
+    this.scrollReveal.observeAll();
+    this.initParallax();
+  }
+
+  private initParallax() {
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReduced) return;
+
+    const hero = this.el.nativeElement.querySelector('.hero-content') as HTMLElement;
+    const overlay = this.el.nativeElement.querySelector('.hero-overlay') as HTMLElement;
+    if (!hero) return;
+
+    const onScroll = () => {
+      this.rafId = requestAnimationFrame(() => {
+        const y = window.scrollY;
+        if (y < window.innerHeight) {
+          hero.style.transform = `translateY(${y * 0.35}px)`;
+          hero.style.opacity = String(1 - y / (window.innerHeight * 0.8));
+          if (overlay) overlay.style.opacity = String(0.6 + y / (window.innerHeight * 2));
+        }
+      });
+    };
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    // Store cleanup on destroy
+    (this as any)._removeParallax = () => window.removeEventListener('scroll', onScroll);
+  }
+
+  ngOnDestroy() {
+    cancelAnimationFrame(this.rafId);
+    (this as any)._removeParallax?.();
+  }
 }
