@@ -1,9 +1,10 @@
 import { Component, inject, computed } from '@angular/core';
 import { TranslationService } from '../../services/translation.service';
+import { Tilt3DDirective } from '../../directives/tilt3d.directive';
 
 @Component({
   selector: 'app-galeria',
-  imports: [],
+  imports: [Tilt3DDirective],
   template: `
     <div class="galeria">
       <section class="page-hero">
@@ -14,7 +15,7 @@ import { TranslationService } from '../../services/translation.service';
       <section class="container">
         <div class="gallery-grid">
           @for (item of galleryItems(); track item.title) {
-            <div class="gallery-item reveal">
+            <div class="gallery-item reveal" tilt3d [tiltMax]="8" [tiltScale]="1.06">
               <div class="gallery-image">
                 @if (item.image) {
                   <img [src]="item.image" [alt]="item.title" class="gallery-img"

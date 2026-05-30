@@ -142,40 +142,147 @@ p {
   transform: translateY(-2px);
 }
 
+/* ══════════════════════════════════════════════
+   3D DESIGN SYSTEM  (UI/UX Pro Max — Liquid Glass + Skeuomorphism 3D)
+   ══════════════════════════════════════════════ */
+
+/* ── Liquid Glass ── */
+.glass {
+  background: rgba(250, 247, 242, 0.55);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(212, 175, 55, 0.18);
+  box-shadow:
+    0 8px 32px rgba(93, 23, 37, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+.glass-dark {
+  background: rgba(26, 26, 26, 0.55);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(212, 175, 55, 0.15);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+/* ── 3D Scene utility ── */
+.scene-3d {
+  perspective: 1200px;
+  perspective-origin: 50% 40%;
+}
+
+/* ── 3D entrance animation ── */
+@keyframes reveal3DUp {
+  from {
+    opacity: 0;
+    transform: perspective(800px) rotateX(20deg) translateY(48px);
+    filter: blur(4px);
+  }
+  to {
+    opacity: 1;
+    transform: perspective(800px) rotateX(0deg) translateY(0);
+    filter: blur(0);
+  }
+}
+
+@keyframes reveal3DLeft {
+  from {
+    opacity: 0;
+    transform: perspective(800px) rotateY(-18deg) translateX(-48px);
+    filter: blur(4px);
+  }
+  to {
+    opacity: 1;
+    transform: perspective(800px) rotateY(0deg) translateX(0);
+    filter: blur(0);
+  }
+}
+
+@keyframes reveal3DRight {
+  from {
+    opacity: 0;
+    transform: perspective(800px) rotateY(18deg) translateX(48px);
+    filter: blur(4px);
+  }
+  to {
+    opacity: 1;
+    transform: perspective(800px) rotateY(0deg) translateX(0);
+    filter: blur(0);
+  }
+}
+
+/* ── Gold shimmer sweep ── */
+@keyframes goldSweep {
+  0%   { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+.gold-shimmer {
+  background: linear-gradient(
+    105deg,
+    var(--gold-elegant) 0%,
+    #f5e27a 45%,
+    var(--gold-warm) 55%,
+    var(--gold-elegant) 100%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: goldSweep 3s linear infinite;
+}
+
+/* ── Floating 3D orbs (decorative) ── */
+@keyframes floatOrb {
+  0%, 100% { transform: translateY(0) translateZ(0) scale(1); opacity: 0.6; }
+  33%       { transform: translateY(-18px) translateZ(8px) scale(1.05); opacity: 0.8; }
+  66%       { transform: translateY(-8px) translateZ(-4px) scale(0.97); opacity: 0.7; }
+}
+
 /* ── Scroll Reveal (Motion-Driven pattern) ── */
 .reveal {
   opacity: 0;
-  transform: translateY(40px);
+  transform: perspective(800px) rotateX(14deg) translateY(40px);
+  filter: blur(2px);
   transition:
-    opacity  var(--dur-slow) var(--ease-elegant),
-    transform var(--dur-slow) var(--ease-elegant);
+    opacity   var(--dur-slow) var(--ease-elegant),
+    transform var(--dur-slow) var(--ease-elegant),
+    filter    var(--dur-slow) var(--ease-elegant);
 }
 
 .reveal.visible {
   opacity: 1;
-  transform: translateY(0);
+  transform: perspective(800px) rotateX(0deg) translateY(0);
+  filter: blur(0);
 }
 
 .reveal-left {
   opacity: 0;
-  transform: translateX(-48px);
+  transform: perspective(800px) rotateY(-14deg) translateX(-48px);
+  filter: blur(2px);
   transition:
-    opacity  var(--dur-slow) var(--ease-elegant),
-    transform var(--dur-slow) var(--ease-elegant);
+    opacity   var(--dur-slow) var(--ease-elegant),
+    transform var(--dur-slow) var(--ease-elegant),
+    filter    var(--dur-slow) var(--ease-elegant);
 }
 
 .reveal-right {
   opacity: 0;
-  transform: translateX(48px);
+  transform: perspective(800px) rotateY(14deg) translateX(48px);
+  filter: blur(2px);
   transition:
-    opacity  var(--dur-slow) var(--ease-elegant),
-    transform var(--dur-slow) var(--ease-elegant);
+    opacity   var(--dur-slow) var(--ease-elegant),
+    transform var(--dur-slow) var(--ease-elegant),
+    filter    var(--dur-slow) var(--ease-elegant);
 }
 
 .reveal-left.visible,
 .reveal-right.visible {
   opacity: 1;
-  transform: translateX(0);
+  transform: perspective(800px) rotateY(0deg) translateX(0);
+  filter: blur(0);
 }
 
 /* Stagger delays for grouped reveals */

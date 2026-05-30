@@ -1,13 +1,14 @@
 import { Component, inject, computed, signal, AfterViewInit, OnDestroy, ElementRef, effect } from '@angular/core';
 import { TranslationService } from '../../services/translation.service';
 import { ScrollRevealService } from '../../services/scroll-reveal.service';
+import { Tilt3DDirective } from '../../directives/tilt3d.directive';
 
 type WineCategoryKey = 'red' | 'white' | 'rose' | 'sparkling';
 type FilterKey = 'all' | WineCategoryKey;
 
 @Component({
   selector: 'app-vinos',
-  imports: [],
+  imports: [Tilt3DDirective],
   template: `
     <div class="vinos">
       <section class="page-hero">
@@ -30,7 +31,7 @@ type FilterKey = 'all' | WineCategoryKey;
 
         <div class="wines-grid">
           @for (wine of filteredWines(); track wine.name; let i = $index) {
-          <div class="wine-card" [style.--i]="i">
+          <div class="wine-card" tilt3d [tiltMax]="10" [style.--i]="i">
             <div class="wine-image">
               <div class="wine-icon-wrap">
                 <svg class="wine-svg" viewBox="0 0 64 120" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -175,25 +176,35 @@ type FilterKey = 'all' | WineCategoryKey;
 
     .wines-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
       gap: 2.5rem;
       margin-bottom: 4rem;
+      perspective: 1400px;
     }
 
     /* ── Card entrance animation ── */
     @keyframes cardReveal {
-      from { opacity: 0; transform: translateY(48px); }
-      to   { opacity: 1; transform: translateY(0); }
+      from {
+        opacity: 0;
+        transform: perspective(900px) rotateX(18deg) translateY(48px);
+        filter: blur(4px);
+      }
+      to {
+        opacity: 1;
+        transform: perspective(900px) rotateX(0deg) translateY(0);
+        filter: blur(0);
+      }
     }
 
     @keyframes bottleFloat {
-      0%, 100% { transform: translateY(0px) rotate(-1deg); }
-      50%       { transform: translateY(-10px) rotate(1deg); }
+      0%, 100% { transform: translateY(0px) rotateY(-3deg) rotateZ(-1deg); }
+      33%       { transform: translateY(-12px) rotateY(3deg) rotateZ(1deg); }
+      66%       { transform: translateY(-6px) rotateY(0deg) rotateZ(-0.5deg); }
     }
 
     @keyframes glowPulse {
-      0%, 100% { opacity: 0.15; transform: scale(1); }
-      50%       { opacity: 0.35; transform: scale(1.15); }
+      0%, 100% { opacity: 0.2; transform: scale(1) translateZ(-10px); }
+      50%       { opacity: 0.45; transform: scale(1.2) translateZ(10px); }
     }
 
     @keyframes shimmerSlide {
@@ -205,65 +216,64 @@ type FilterKey = 'all' | WineCategoryKey;
       background: white;
       border-radius: 0;
       overflow: hidden;
-      box-shadow: 0 10px 40px rgba(93, 23, 37, 0.08);
-      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-                  box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-                  border-color 0.3s ease;
-      border: 1px solid rgba(93, 23, 37, 0.06);
+      box-shadow:
+        0 4px 6px rgba(93,23,37,0.04),
+        0 10px 40px rgba(93,23,37,0.08),
+        0 0 0 1px rgba(93,23,37,0.05);
+      border: none;
       opacity: 0;
-      animation: cardReveal 0.6s cubic-bezier(0.4, 0, 0.2, 1) both;
+      transform-style: preserve-3d;
+      animation: cardReveal 0.7s cubic-bezier(0.4, 0, 0.2, 1) both;
       animation-delay: calc(var(--i, 0) * 80ms);
     }
 
-    .wine-card:hover {
-      transform: translateY(-12px);
-      box-shadow: 0 28px 64px rgba(93, 23, 37, 0.18);
-      border-color: var(--gold-elegant);
-    }
-
-    /* ── Wine image area ── */
+    /* ── Wine image — 3D showcase ── */
     .wine-image {
-      background: linear-gradient(180deg, #f2ece4 0%, #faf8f5 100%);
+      background:
+        radial-gradient(ellipse at 50% 0%, rgba(212,175,55,0.12) 0%, transparent 60%),
+        linear-gradient(180deg, #ede5d8 0%, #f8f4ef 60%, #fff 100%);
       padding: 3rem 2rem;
       text-align: center;
-      min-height: 260px;
+      min-height: 280px;
       display: flex;
       align-items: center;
       justify-content: center;
       position: relative;
       overflow: hidden;
       cursor: pointer;
+      perspective: 600px;
+      transform-style: preserve-3d;
     }
 
-    /* shimmer sweep on hover */
-    .wine-image::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 60%;
-      height: 100%;
-      background: linear-gradient(
-        105deg,
-        transparent 20%,
-        rgba(212, 175, 55, 0.18) 50%,
-        transparent 80%
-      );
-      transition: none;
-      z-index: 2;
-      pointer-events: none;
-    }
-
-    .wine-card:hover .wine-image::before {
-      animation: shimmerSlide 0.7s ease forwards;
-    }
-
+    /* Reflective floor */
     .wine-image::after {
       content: '';
       position: absolute;
-      inset: 0;
-      background: radial-gradient(circle at 50% 30%, rgba(212, 175, 55, 0.12) 0%, transparent 65%);
-      z-index: 0;
+      bottom: 0;
+      left: 10%;
+      width: 80%;
+      height: 30%;
+      background: linear-gradient(to top, rgba(212,175,55,0.08), transparent);
+      border-radius: 50%;
+      filter: blur(12px);
+      pointer-events: none;
+    }
+
+    /* Gold shimmer sweep */
+    .wine-image::before {
+      content: '';
+      position: absolute;
+      top: 0; left: -100%;
+      width: 60%; height: 100%;
+      background: linear-gradient(105deg,
+        transparent 20%,
+        rgba(212,175,55,0.22) 50%,
+        transparent 80%);
+      z-index: 2;
+      pointer-events: none;
+    }
+    .wine-card:hover .wine-image::before {
+      animation: shimmerSlide 0.65s ease forwards;
     }
 
     .wine-icon-wrap {
@@ -272,32 +282,39 @@ type FilterKey = 'all' | WineCategoryKey;
       display: flex;
       align-items: center;
       justify-content: center;
+      transform-style: preserve-3d;
     }
 
     .wine-svg {
-      width: 80px;
-      height: 150px;
+      width: 86px;
+      height: 160px;
       color: var(--wine-deep);
-      animation: bottleFloat 4s ease-in-out infinite;
-      filter: drop-shadow(0 8px 20px rgba(93, 23, 37, 0.25));
-      transition: filter 0.4s ease;
+      animation: bottleFloat 4.5s ease-in-out infinite;
+      filter:
+        drop-shadow(0 12px 24px rgba(93,23,37,0.3))
+        drop-shadow(0 4px 8px rgba(93,23,37,0.15));
+      transition: filter 0.5s ease, transform 0.5s cubic-bezier(0.34,1.56,0.64,1);
+      transform-origin: center bottom;
     }
 
     .wine-card:hover .wine-svg {
-      filter: drop-shadow(0 12px 30px rgba(93, 23, 37, 0.4))
-              drop-shadow(0 0 20px rgba(212, 175, 55, 0.3));
+      filter:
+        drop-shadow(0 20px 40px rgba(93,23,37,0.45))
+        drop-shadow(0 0 30px rgba(202,138,4,0.35))
+        drop-shadow(0 0 60px rgba(202,138,4,0.15));
       animation-play-state: paused;
-      transform: scale(1.08) translateY(-4px);
-      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), filter 0.4s ease;
+      transform: scale(1.12) translateY(-8px) translateZ(20px);
     }
 
     .wine-glow {
       position: absolute;
-      inset: 0;
+      width: 140px; height: 140px;
       border-radius: 50%;
-      background: radial-gradient(circle, rgba(212, 175, 55, 0.25) 0%, transparent 70%);
-      animation: glowPulse 3s ease-in-out infinite;
+      background: radial-gradient(circle, rgba(202,138,4,0.3) 0%, transparent 70%);
+      animation: glowPulse 3.5s ease-in-out infinite;
       pointer-events: none;
+      transform: translateZ(-20px);
+      filter: blur(8px);
     }
 
     /* ── Reduced motion ── */

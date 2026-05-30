@@ -2,10 +2,11 @@ import { Component, inject, computed, AfterViewInit, OnDestroy, ElementRef } fro
 import { RouterLink } from '@angular/router';
 import { TranslationService } from '../../services/translation.service';
 import { ScrollRevealService } from '../../services/scroll-reveal.service';
+import { Tilt3DDirective } from '../../directives/tilt3d.directive';
 
 @Component({
   selector: 'app-home',
-  imports: [RouterLink],
+  imports: [RouterLink, Tilt3DDirective],
   template: `
     <div class="home">
       <!-- Hero Section -->
@@ -26,7 +27,7 @@ import { ScrollRevealService } from '../../services/scroll-reveal.service';
           <h2 class="reveal">{{ t().featured.title }}</h2>
           <div class="wine-grid">
             @for (wine of featuredWines(); track wine.name) {
-              <div class="wine-card reveal">
+              <div class="wine-card reveal" tilt3d>
                 <div class="wine-image">
                   <img [src]="wine.image" [alt]="wine.name" class="wine-bottle"
                        onerror="this.style.display='none';this.parentElement.innerHTML='<div class=wine-placeholder></div>'" />
@@ -116,43 +117,52 @@ import { ScrollRevealService } from '../../services/scroll-reveal.service';
       position: relative;
       z-index: 2;
       max-width: 900px;
-      animation: fadeInUp 1.5s ease-out;
+      animation: heroEnter 1.8s cubic-bezier(0.4, 0, 0.2, 1) both;
+      transform-style: preserve-3d;
     }
 
-    @keyframes fadeInUp {
+    @keyframes heroEnter {
       from {
         opacity: 0;
-        transform: translateY(30px);
+        transform: perspective(1000px) rotateX(10deg) translateY(50px);
+        filter: blur(6px);
       }
       to {
         opacity: 1;
-        transform: translateY(0);
+        transform: perspective(1000px) rotateX(0deg) translateY(0);
+        filter: blur(0);
       }
     }
 
     .hero-title {
-      font-family: 'Playfair Display', serif;
-      font-size: 5rem;
-      font-weight: 400;
-      margin-bottom: 1rem;
-      text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-      letter-spacing: 2px;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 6rem;
+      font-weight: 300;
+      margin-bottom: 1.5rem;
+      text-shadow:
+        0 4px 20px rgba(0,0,0,0.4),
+        0 0 80px rgba(202,138,4,0.2);
+      letter-spacing: 6px;
       color: var(--bg-cream);
       text-transform: uppercase;
     }
 
     .hero-subtitle {
-      font-family: 'Lato', sans-serif;
-      font-size: 1.2rem;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 0.95rem;
       margin-bottom: 3rem;
       font-weight: 300;
-      letter-spacing: 6px;
+      letter-spacing: 7px;
       text-transform: uppercase;
       color: var(--gold-light);
-      border-top: 1px solid var(--gold-light);
-      border-bottom: 1px solid var(--gold-light);
+      /* Liquid glass pill */
+      background: rgba(255,255,255,0.06);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(232,212,160,0.3);
       display: inline-block;
-      padding: 1rem 2rem;
+      padding: 0.9rem 2.5rem;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.1);
     }
 
     .hero-description {
@@ -201,42 +211,42 @@ import { ScrollRevealService } from '../../services/scroll-reveal.service';
       grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
       gap: 3rem;
       margin-top: 4rem;
+      perspective: 1400px;
     }
 
     .wine-card {
       background: white;
       padding: 0;
       text-align: center;
-      box-shadow: 0 10px 40px rgba(93, 23, 37, 0.08);
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      border: 1px solid rgba(93, 23, 37, 0.05);
+      box-shadow:
+        0 4px 6px rgba(93,23,37,0.04),
+        0 10px 40px rgba(93,23,37,0.08);
+      border: 1px solid rgba(93,23,37,0.05);
       overflow: hidden;
-    }
-
-    .wine-card:hover {
-      transform: translateY(-10px);
-      box-shadow: 0 20px 60px rgba(93, 23, 37, 0.15);
+      transform-style: preserve-3d;
     }
 
     .wine-image {
       margin-bottom: 0;
-      background: linear-gradient(180deg, #f8f5f0 0%, #ffffff 100%);
+      background:
+        radial-gradient(ellipse at 50% 0%, rgba(212,175,55,0.1) 0%, transparent 60%),
+        linear-gradient(180deg, #ede5d8 0%, #f8f4ef 60%, #fff 100%);
       padding: 3rem 2rem;
       position: relative;
       display: flex;
       align-items: center;
       justify-content: center;
       min-height: 350px;
+      overflow: hidden;
     }
 
     .wine-image::after {
       content: '';
       position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: radial-gradient(circle at 50% 20%, rgba(212, 175, 55, 0.1) 0%, transparent 60%);
+      bottom: 0; left: 15%; width: 70%; height: 25%;
+      background: linear-gradient(to top, rgba(212,175,55,0.1), transparent);
+      border-radius: 50%;
+      filter: blur(10px);
     }
 
     .wine-bottle {
@@ -245,24 +255,32 @@ import { ScrollRevealService } from '../../services/scroll-reveal.service';
       width: auto;
       height: auto;
       object-fit: contain;
-      filter: drop-shadow(0 10px 30px rgba(93, 23, 37, 0.25));
+      filter:
+        drop-shadow(0 14px 28px rgba(93,23,37,0.28))
+        drop-shadow(0 4px 8px rgba(93,23,37,0.12));
       position: relative;
       z-index: 1;
-      transition: transform 0.4s ease;
+      transition: transform 0.5s cubic-bezier(0.34,1.56,0.64,1), filter 0.4s ease;
     }
 
     .wine-card:hover .wine-bottle {
-      transform: scale(1.05);
+      transform: scale(1.08) translateY(-8px) translateZ(16px);
+      filter:
+        drop-shadow(0 24px 48px rgba(93,23,37,0.4))
+        drop-shadow(0 0 30px rgba(202,138,4,0.25));
     }
 
     .wine-placeholder {
-      font-size: 5rem;
-      color: var(--wine-deep);
+      width: 80px; height: 150px;
+      background: linear-gradient(180deg, var(--wine-deep) 0%, var(--wine-burgundy) 100%);
+      opacity: 0.2;
+      border-radius: 4px;
     }
 
     .wine-card h3 {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.75rem;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.85rem;
+      font-weight: 500;
       margin: 2rem 0 0.75rem;
       color: var(--wine-deep);
       padding: 0 1.5rem;

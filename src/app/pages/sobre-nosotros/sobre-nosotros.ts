@@ -1,9 +1,10 @@
 import { Component, inject, computed } from '@angular/core';
 import { TranslationService } from '../../services/translation.service';
+import { Tilt3DDirective } from '../../directives/tilt3d.directive';
 
 @Component({
   selector: 'app-sobre-nosotros',
-  imports: [],
+  imports: [Tilt3DDirective],
   template: `
     <div class="sobre-nosotros">
       <section class="page-hero">
@@ -56,7 +57,7 @@ import { TranslationService } from '../../services/translation.service';
           <h2 class="reveal">{{ t().aboutPage.valuesTitle }}</h2>
           <div class="values-grid">
             @for (value of values(); track value.title) {
-              <div class="value-card reveal">
+              <div class="value-card reveal" tilt3d [tiltMax]="10">
                 <div class="value-icon">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="36" height="36">
                     @if (value.icon === '🌱') {
@@ -85,7 +86,7 @@ import { TranslationService } from '../../services/translation.service';
           <p class="team-intro reveal reveal-delay-1">{{ t().aboutPage.teamIntro }}</p>
           <div class="team-grid">
             @for (member of team(); track member.name) {
-              <div class="team-member reveal">
+              <div class="team-member reveal" tilt3d [tiltMax]="8">
                 <div class="member-avatar">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" width="44" height="44">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"/>
